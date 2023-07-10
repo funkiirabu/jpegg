@@ -1,23 +1,13 @@
+// App.js
+import React from 'react';
+import FetchCollection from './components/FetchCollection'; // FetchCollection.js
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <FetchCollection slug="0x71ef69d02e77dff830c7de41db1452928c8ecd9040a541eef6729f139df83ffd" />
     </div>
   );
 }
