@@ -2,32 +2,50 @@
 import React from 'react';
 import { useQuery, gql } from '@apollo/client';
 
-const FETCH_TOP_COLLECTIONS = gql`
-  query fetchTopCollections($offset: Int, $limit: Int) {
+const FETCH_TRENDING_COLLECTIONS = gql`
+  query fetchTrendingCollections(
+    $period: TrendingPeriod!
+    $trending_by: TrendingBy!
+    $offset: Int! = 0
+    $limit: Int! = 10
+  ) {
     sui {
-      collections(
+      collections_trending(
+        period: $period
+        trending_by: $trending_by
         offset: $offset
         limit: $limit
-        order_by: { usd_volume: desc }
-        where: { verified: { _eq: true } }
       ) {
-        id
-        slug
-        title
-        supply
-        cover_url
-        floor
-        usd_volume
-        volume
-        verified
+        id: collection_id
+        current_trades_count
+        current_usd_volume
+        current_volume
+        previous_trades_count
+        previous_usd_volume
+        previous_volume
+        collection {
+          slug
+          title
+          supply
+          cover_url
+          floor
+          usd_volume
+          volume
+          verified
+        }
       }
     }
   }
 `;
 
 const TopCollections = () => {
-  const { loading, error, data } = useQuery(FETCH_TOP_COLLECTIONS, {
-    variables: { limit: 10 },
+  const { loading, error, data } = useQuery(FETCH_TRENDING_COLLECTIONS, {
+    variables: {
+      period: "days_1",
+      trending_by: "usd_volume",
+      offset: 0,
+      limit: 10
+    }
   });
 
   if (loading) return <p>Loading...</p>;
@@ -44,29 +62,31 @@ const TopCollections = () => {
         <tr>
           <th>Cover</th>
           <th>Title</th>
-          <th>Supply</th>
-          <th>USD Volume</th>
-          <th>Volume</th>
-          <th>Floor</th>
-          <th>Verified</th>
+          <th>Current Trades Count</th>
+          <th>Current USD Volume</th>
+          <th>Current Volume</th>
+          <th>Previous Trades Count</th>
+          <th>Previous USD Volume</th>
+          <th>Previous Volume</th>
         </tr>
       </thead>
       <tbody>
-        {data.sui.collections.map((collection) => (
-          <tr key={collection.id}>
+        {data.sui.collections_trending.map((trendingCollection) => (
+          <tr key={trendingCollection.id}>
             <td>
               <img
                 className="w-20 h-20 object-cover"
-                src={collection.cover_url}
-                alt={collection.title}
+                src={trendingCollection.collection.cover_url}
+                alt={trendingCollection.collection.title}
               />
             </td>
-            <td>{collection.title}</td>
-            <td>{collection.supply}</td>
-            <td>{formatCurrency(collection.usd_volume)}</td>
-            <td>{Number(collection.volume).toString().replace(/[^\d]/g, '').slice(0, 7)}</td>
-            <td>{collection.floor ? String(collection.floor).substring(0, 2) : 'N/A'}</td> {/* display first two digits of floor */}
-            <td>{collection.verified ? 'Yes' : 'No'}</td>
+            <td>{trendingCollection.collection.title}</td>
+            <td>{trendingCollection.current_trades_count}</td>
+            <td>{formatCurrency(trendingCollection.current_usd_volume)}</td>
+            <td>{trendingCollection.current_volume}</td>
+            <td>{trendingCollection.previous_trades_count}</td>
+            <td>{formatCurrency(trendingCollection.previous_usd_volume)}</td>
+            <td>{trendingCollection.previous_volume}</td>
           </tr>
         ))}
       </tbody>
