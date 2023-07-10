@@ -64,8 +64,8 @@ const TopCollections = () => {
             <td>{collection.title}</td>
             <td>{collection.supply}</td>
             <td>{formatCurrency(collection.usd_volume)}</td>
-            <td>{collection.volume}</td>
-            <td>{collection.floor}</td>
+            <td>{Number(collection.volume).toString().replace(/[^\d]/g, '').slice(0, 7)}</td>
+            <td>{collection.floor ? String(collection.floor).substring(0, 2) : 'N/A'}</td> {/* display first two digits of floor */}
             <td>{collection.verified ? 'Yes' : 'No'}</td>
           </tr>
         ))}
