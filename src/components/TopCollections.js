@@ -2,6 +2,7 @@
 import React from 'react';
 import { useQuery, gql } from '@apollo/client';
 
+// GraphQL query to fetch trending collections
 const FETCH_TRENDING_COLLECTIONS = gql`
   query fetchTrendingCollections(
     $period: TrendingPeriod!
@@ -39,6 +40,7 @@ const FETCH_TRENDING_COLLECTIONS = gql`
 `;
 
 const TopCollections = () => {
+  // Fetch data using the GraphQL query
   const { loading, error, data } = useQuery(FETCH_TRENDING_COLLECTIONS, {
     variables: {
       period: "days_1",
@@ -48,16 +50,21 @@ const TopCollections = () => {
     }
   });
 
+  // Loading state: Display a loading message while data is being fetched
   if (loading) return <p>Loading...</p>;
+
+  // Error state: Display an error message if there's an error fetching the data
   if (error) return <p>Error: {error.message}</p>;
 
-  // Function to format number as USD currency
+  // Function to format a number as USD currency
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
-  }
+  };
 
+  // Function to compute percentage change
   const computePercentageChange = (current, previous) => ((current - previous) / previous) * 100;
 
+  // Function to render percentage change with appropriate styling
   const renderChange = (current, previous) => {
     const percentageChange = computePercentageChange(current, previous);
     return (
@@ -68,7 +75,7 @@ const TopCollections = () => {
         {percentageChange.toFixed(2)}%
       </span>
     );
-  }
+  };
 
   return (
     <table className="table-auto w-full mt-10">
@@ -85,6 +92,7 @@ const TopCollections = () => {
         {data.sui.collections_trending.map((trendingCollection) => (
           <tr key={trendingCollection.id}>
             <td>
+              {/* Display the collection cover image */}
               <img
                 className="w-20 h-20 object-cover"
                 src={trendingCollection.collection.cover_url}
@@ -93,6 +101,7 @@ const TopCollections = () => {
             </td>
             <td>{trendingCollection.collection.title}</td>
             <td>
+              {/* Display the current trades count */}
               {trendingCollection.current_trades_count}
               {/* Show the percentage change for trades count */}
               {renderChange(trendingCollection.current_trades_count, trendingCollection.previous_trades_count)}
@@ -104,6 +113,7 @@ const TopCollections = () => {
               {renderChange(trendingCollection.current_usd_volume, trendingCollection.previous_usd_volume)}
             </td>
             <td>
+              {/* Display the current volume */}
               {trendingCollection.current_volume}
               {/* Show the percentage change for volume */}
               {renderChange(trendingCollection.current_volume, trendingCollection.previous_volume)}
