@@ -9,6 +9,7 @@ const FETCH_TOP_COLLECTIONS = gql`
         offset: $offset
         limit: $limit
         order_by: { usd_volume: desc }
+        where: { verified: { _eq: true } }
       ) {
         id
         slug
@@ -31,6 +32,11 @@ const TopCollections = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
+
+  // Function to format number as USD currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  }
 
   return (
     <table className="table-auto w-full mt-10">
@@ -57,7 +63,7 @@ const TopCollections = () => {
             </td>
             <td>{collection.title}</td>
             <td>{collection.supply}</td>
-            <td>{collection.usd_volume}</td>
+            <td>{formatCurrency(collection.usd_volume)}</td>
             <td>{collection.volume}</td>
             <td>{collection.floor}</td>
             <td>{collection.verified ? 'Yes' : 'No'}</td>
