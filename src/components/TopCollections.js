@@ -1,6 +1,7 @@
-// src/components/TopCollections.js
 import React from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
+import { getDataFromTree } from '@apollo/client/react/ssr';
+import { createApolloClient } from '../apollo';
 
 // GraphQL query to fetch trending collections
 const FETCH_TRENDING_COLLECTIONS = gql`
@@ -39,15 +40,15 @@ const FETCH_TRENDING_COLLECTIONS = gql`
   }
 `;
 
-const TopCollections = () => {
+const TopCollections = ({ initialApolloState }) => {
   // Fetch data using the GraphQL query
   const { loading, error, data } = useQuery(FETCH_TRENDING_COLLECTIONS, {
     variables: {
-      period: "days_1",
-      trending_by: "usd_volume",
+      period: 'days_1',
+      trending_by: 'usd_volume',
       offset: 0,
-      limit: 10
-    }
+      limit: 10,
+    },
   });
 
   // Loading state: Display a loading message while data is being fetched
@@ -69,8 +70,9 @@ const TopCollections = () => {
     const percentageChange = computePercentageChange(current, previous);
     return (
       <span
-        className={`inline-block ml-2 px-2 text-sm rounded 
-                    ${percentageChange >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}
+        className={`inline-block ml-2 px-2 text-sm rounded ${
+          percentageChange >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+        }`}
       >
         {percentageChange.toFixed(2)}%
       </span>
@@ -124,5 +126,19 @@ const TopCollections = () => {
     </table>
   );
 };
+
+// Server-side rendering function
+export async function getServerSideProps() {
+  const apolloClient = createApolloClient();
+  await getDataFromTree(<TopCollections />, {
+    client: apolloClient,
+  });
+
+  return {
+    props: {
+      initialApolloState: apolloClient.cache.extract(),
+    },
+  };
+}
 
 export default TopCollections;
