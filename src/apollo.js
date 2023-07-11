@@ -1,5 +1,4 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import { getDataFromTree } from '@apollo/client/react/ssr';
 
 // Create an http link for SSR
 const httpLink = createHttpLink({
@@ -18,4 +17,3 @@ export const createApolloClient = () => {
     cache: new InMemoryCache(),
   });
 };
-

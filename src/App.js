@@ -3,7 +3,7 @@ import { ApolloProvider } from '@apollo/client';
 import { createApolloClient } from './apollo';
 // import FetchCollection from './components/FetchCollection'; // FetchCollection.js
 import TopCollections from './components/TopCollections'; // TopCollections.js
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 
 function App() {
