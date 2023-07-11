@@ -1,8 +1,8 @@
 # Jpegg
 
 ## Summary
-- React 18 Javascript framework
-- TailwindCSS Library
+- React 18
+- Tailwind CSS Library
 - Apollo GraphQL Client
 
 ## Setup
