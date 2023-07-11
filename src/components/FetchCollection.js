@@ -1,3 +1,4 @@
+// src/components/FetchCollection.js
 import React from 'react';
 import { useQuery, gql } from '@apollo/client';
 import '../App.css';  // Make sure this is the correct path to your CSS file
