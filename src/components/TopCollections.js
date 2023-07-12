@@ -49,8 +49,8 @@ const TopCollections = () => {
       period,
       trending_by: 'usd_volume',
       offset: 0,
-      limit: 10
-    }
+      limit: 10,
+    },
   });
 
   // Function to handle period change
@@ -78,6 +78,19 @@ const TopCollections = () => {
     );
   };
 
+  // Function to format the current_volume property
+  const formatCurrentVolume = (volume) => {
+    if (volume >= 1000000000) {
+      return `${(volume / 1000000000).toFixed(2)}`;
+    } else if (volume >= 1000000) {
+      return `${(volume / 1000000).toFixed(2)}`;
+    } else if (volume >= 1000) {
+      return `${(volume / 1000).toFixed(2)}`;
+    } else {
+      return volume.toFixed(0);
+    }
+  };
+
   // Define the column configuration for the table
   const tableColumns = [
     { key: 'cover_url', header: 'Cover' },
@@ -101,15 +114,14 @@ const TopCollections = () => {
     current_trades_count: (
       <>
         {trendingCollection.current_trades_count}
-        {renderChange(
-          trendingCollection.current_trades_count,
-          trendingCollection.previous_trades_count
-        )}
+        {renderChange(trendingCollection.current_trades_count, trendingCollection.previous_trades_count)}
       </>
     ),
     current_usd_volume: (
       <>
-        {trendingCollection.current_usd_volume}
+        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+          Math.floor(trendingCollection.current_usd_volume)
+        )}
         {renderChange(
           trendingCollection.current_usd_volume,
           trendingCollection.previous_usd_volume
@@ -118,11 +130,8 @@ const TopCollections = () => {
     ),
     current_volume: (
       <>
-        {trendingCollection.current_volume}
-        {renderChange(
-          trendingCollection.current_volume,
-          trendingCollection.previous_volume
-        )}
+        {formatCurrentVolume(trendingCollection.current_volume)}
+        {renderChange(trendingCollection.current_volume, trendingCollection.previous_volume)}
       </>
     ),
   }));
