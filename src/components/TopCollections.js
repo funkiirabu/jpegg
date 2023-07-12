@@ -81,14 +81,21 @@ const TopCollections = () => {
   // Function to format the current_volume property
   const formatCurrentVolume = (volume) => {
     if (volume >= 1000000000) {
-      return `${(volume / 1000000000).toFixed(2)}`;
+      return `${(volume / 1000000000).toFixed(2)}B`;
     } else if (volume >= 1000000) {
-      return `${(volume / 1000000).toFixed(2)}`;
+      return `${(volume / 1000000).toFixed(2)}M`;
     } else if (volume >= 1000) {
-      return `${(volume / 1000).toFixed(2)}`;
+      return `${(volume / 1000).toFixed(2)}K`;
     } else {
       return volume.toFixed(0);
     }
+  };
+
+  // Function to format the current_usd_volume property in USD currency format
+  const formatCurrentUSDVolume = (usdVolume) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(
+      Math.floor(usdVolume)
+    );
   };
 
   // Define the column configuration for the table
@@ -119,13 +126,8 @@ const TopCollections = () => {
     ),
     current_usd_volume: (
       <>
-        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-          Math.floor(trendingCollection.current_usd_volume)
-        )}
-        {renderChange(
-          trendingCollection.current_usd_volume,
-          trendingCollection.previous_usd_volume
-        )}
+        {formatCurrentUSDVolume(trendingCollection.current_usd_volume)}
+        {renderChange(trendingCollection.current_usd_volume, trendingCollection.previous_usd_volume)}
       </>
     ),
     current_volume: (
