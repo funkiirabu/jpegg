@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
-import Dropdown from '../ui/Dropdown'; // Assuming the Dropdown component is in the 'ui' folder
+import Dropdown from '../ui/Dropdown';
+import Table from '../ui/Table';
 
 const FETCH_TRENDING_COLLECTIONS = gql`
   query fetchTrendingCollections(
@@ -48,8 +49,8 @@ const TopCollections = () => {
       period,
       trending_by: 'usd_volume',
       offset: 0,
-      limit: 10
-    }
+      limit: 10,
+    },
   });
 
   // Function to handle period change
@@ -63,26 +64,77 @@ const TopCollections = () => {
   // Error state: Display an error message if there's an error fetching the data
   if (error) return <p>Error: {error.message}</p>;
 
-  // Function to format a number as USD currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
-  };
-
   // Function to compute percentage change
   const computePercentageChange = (current, previous) => ((current - previous) / previous) * 100;
 
   // Function to render percentage change with appropriate styling
   const renderChange = (current, previous) => {
     const percentageChange = computePercentageChange(current, previous);
+    const changeColor = percentageChange >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
     return (
-      <span
-        className={`inline-block ml-2 px-2 text-sm rounded 
-                    ${percentageChange >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}
-      >
+      <span className={`inline-block ml-2 px-2 text-sm rounded ${changeColor}`}>
         {percentageChange.toFixed(2)}%
       </span>
     );
   };
+
+  // Function to format the current_volume property
+  const formatCurrentVolume = (volume) => {
+    if (volume >= 1000000000) {
+      return `${(volume / 1000000000).toFixed(2)}`;
+    } else if (volume >= 1000000) {
+      return `${(volume / 1000000).toFixed(2)}`;
+    } else if (volume >= 1000) {
+      return `${(volume / 1000).toFixed(2)}`;
+    } else {
+      return volume.toFixed(0);
+    }
+  };
+
+  // Define the column configuration for the table
+  const tableColumns = [
+    { key: 'cover_url', header: 'Cover' },
+    { key: 'title', header: 'Title' },
+    { key: 'current_trades_count', header: 'Sales' },
+    { key: 'current_usd_volume', header: '24h USD Volume' },
+    { key: 'current_volume', header: '24h Sui Volume' },
+  ];
+
+  // Prepare the data for the table rows
+  const tableRows = data.sui.collections_trending.map((trendingCollection) => ({
+    id: trendingCollection.id,
+    cover_url: (
+      <img
+        className="w-20 h-20 object-cover"
+        src={trendingCollection.collection.cover_url}
+        alt={trendingCollection.collection.title}
+      />
+    ),
+    title: trendingCollection.collection.title,
+    current_trades_count: (
+      <>
+        {trendingCollection.current_trades_count}
+        {renderChange(trendingCollection.current_trades_count, trendingCollection.previous_trades_count)}
+      </>
+    ),
+    current_usd_volume: (
+      <>
+        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+          Math.floor(trendingCollection.current_usd_volume)
+        )}
+        {renderChange(
+          trendingCollection.current_usd_volume,
+          trendingCollection.previous_usd_volume
+        )}
+      </>
+    ),
+    current_volume: (
+      <>
+        {formatCurrentVolume(trendingCollection.current_volume)}
+        {renderChange(trendingCollection.current_volume, trendingCollection.previous_volume)}
+      </>
+    ),
+  }));
 
   return (
     <div>
@@ -99,60 +151,7 @@ const TopCollections = () => {
       />
 
       {/* Table to display the trending collections */}
-      <table className="table-auto w-full mt-10">
-        <thead>
-          <tr>
-            <th>Cover</th>
-            <th>Title</th>
-            <th>Sales</th>
-            <th>24h USD Volume</th>
-            <th>24h Sui Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Map over the trending collections and render each row */}
-          {data.sui.collections_trending.map((trendingCollection) => (
-            <tr key={trendingCollection.id}>
-              <td>
-                {/* Display the collection cover image */}
-                <img
-                  className="w-20 h-20 object-cover"
-                  src={trendingCollection.collection.cover_url}
-                  alt={trendingCollection.collection.title}
-                />
-              </td>
-              <td>{trendingCollection.collection.title}</td>
-              <td>
-                {/* Display the current trades count */}
-                {trendingCollection.current_trades_count}
-                {/* Show the percentage change for trades count */}
-                {renderChange(
-                  trendingCollection.current_trades_count,
-                  trendingCollection.previous_trades_count
-                )}
-              </td>
-              <td>
-                {/* Show the current USD volume, formatted as currency */}
-                {formatCurrency(trendingCollection.current_usd_volume)}
-                {/* Show the percentage change for USD volume */}
-                {renderChange(
-                  trendingCollection.current_usd_volume,
-                  trendingCollection.previous_usd_volume
-                )}
-              </td>
-              <td>
-                {/* Display the current volume */}
-                {trendingCollection.current_volume}
-                {/* Show the percentage change for volume */}
-                {renderChange(
-                  trendingCollection.current_volume,
-                  trendingCollection.previous_volume
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table data={tableRows} columns={tableColumns} />
     </div>
   );
 };
