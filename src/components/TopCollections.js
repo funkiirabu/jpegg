@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
+import Dropdown from '../ui/Dropdown'; // Assuming the Dropdown component is in the 'ui' folder
 
 const FETCH_TRENDING_COLLECTIONS = gql`
   query fetchTrendingCollections(
@@ -52,8 +53,8 @@ const TopCollections = () => {
   });
 
   // Function to handle period change
-  const handlePeriodChange = (event) => {
-    setPeriod(event.target.value);
+  const handlePeriodChange = (selectedPeriod) => {
+    setPeriod(selectedPeriod);
   };
 
   // Loading state: Display a loading message while data is being fetched
@@ -86,20 +87,16 @@ const TopCollections = () => {
   return (
     <div>
       {/* Dropdown to select the period */}
-      <label htmlFor="period" className="mr-2">
-        Select Period:
-      </label>
-      <select
-        id="period"
+      <Dropdown
         value={period}
         onChange={handlePeriodChange}
-        className="p-2 rounded"
-      >
-        <option value="days_1">1 Day</option>
-        <option value="days_7">7 Days</option>
-        <option value="days_14">14 Days</option>
-        <option value="days_30">30 Days</option>
-      </select>
+        options={[
+          { value: 'days_1', label: '1 Day' },
+          { value: 'days_7', label: '7 Days' },
+          { value: 'days_14', label: '14 Days' },
+          { value: 'days_30', label: '30 Days' },
+        ]}
+      />
 
       {/* Table to display the trending collections */}
       <table className="table-auto w-full mt-10">
