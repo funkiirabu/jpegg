@@ -6,6 +6,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
+// Utility function to generate class names
 const Dropdown = ({ value, onChange, options }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -25,13 +26,13 @@ const Dropdown = ({ value, onChange, options }) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             {options.map((option) => (
               <Menu.Item key={option.value}>
                 {({ active }) => (
-                  <a
-                    href="#"
+                  <button
+                    type="button"
                     className={classNames(
                       active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                       'block px-4 py-2 text-sm'
@@ -39,7 +40,7 @@ const Dropdown = ({ value, onChange, options }) => {
                     onClick={() => onChange(option.value)}
                   >
                     {option.label}
-                  </a>
+                  </button>
                 )}
               </Menu.Item>
             ))}
