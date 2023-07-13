@@ -8,7 +8,7 @@ const Table = ({ data, columns }) => {
           <div className="sm:flex-auto">
             <h1 className="text-base font-semibold leading-6 text-gray-900">Trending Collections</h1>
             <p className="mt-2 text-sm text-gray-700">
-              A list of trending collections including their cover, title, sales, 24h USD volume, and 24h Sui volume.
+              A list of trending collections including their cover, title, sales, USD volume, and Sui volume.
             </p>
           </div>
         </div>
