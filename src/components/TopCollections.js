@@ -8,7 +8,7 @@ const FETCH_TRENDING_COLLECTIONS = gql`
     $period: TrendingPeriod!
     $trending_by: TrendingBy!
     $offset: Int! = 0
-    $limit: Int! = 10
+    $limit: Int! = 50
   ) {
     sui {
       collections_trending(
@@ -49,7 +49,7 @@ const TopCollections = () => {
       period,
       trending_by: 'usd_volume',
       offset: 0,
-      limit: 10,
+      limit: 50,
     },
   });
 
