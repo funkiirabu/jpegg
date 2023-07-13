@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import Dropdown from '../ui/Dropdown';
 import Table from '../ui/Table';
@@ -8,7 +8,7 @@ const FETCH_TRENDING_COLLECTIONS = gql`
     $period: TrendingPeriod!
     $trending_by: TrendingBy!
     $offset: Int! = 0
-    $limit: Int! = 10
+    $limit: Int! = 50
   ) {
     sui {
       collections_trending(
@@ -40,8 +40,9 @@ const FETCH_TRENDING_COLLECTIONS = gql`
 `;
 
 const TopCollections = () => {
-  // State for the selected period
+  // State for the selected period and collection data
   const [period, setPeriod] = useState('days_1');
+  const [collectionData, setCollectionData] = useState([]);
 
   // Fetch data using the GraphQL query
   const { loading, error, data } = useQuery(FETCH_TRENDING_COLLECTIONS, {
@@ -49,34 +50,24 @@ const TopCollections = () => {
       period,
       trending_by: 'usd_volume',
       offset: 0,
-      limit: 10,
+      limit: 50,
     },
   });
+
+  // Update collection data when data changes
+  useEffect(() => {
+    if (data && data.sui && data.sui.collections_trending) {
+      setCollectionData(data.sui.collections_trending);
+    }
+  }, [data]);
 
   // Function to handle period change
   const handlePeriodChange = (selectedPeriod) => {
     setPeriod(selectedPeriod);
   };
 
-  // Loading state: Display a loading message while data is being fetched
-  if (loading) return <p>Loading...</p>;
-
-  // Error state: Display an error message if there's an error fetching the data
-  if (error) return <p>Error: {error.message}</p>;
-
   // Function to compute percentage change
   const computePercentageChange = (current, previous) => ((current - previous) / previous) * 100;
-
-  // Function to render percentage change with appropriate styling
-  const renderChange = (current, previous) => {
-    const percentageChange = computePercentageChange(current, previous);
-    const changeColor = percentageChange >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
-    return (
-      <span className={`inline-block ml-2 px-2 text-sm rounded ${changeColor}`}>
-        {percentageChange.toFixed(2)}%
-      </span>
-    );
-  };
 
   // Function to format the current_volume property
   const formatCurrentVolume = (volume) => {
@@ -93,10 +84,79 @@ const TopCollections = () => {
 
   // Function to format the current_usd_volume property in USD currency format
   const formatCurrentUSDVolume = (usdVolume) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(
-      Math.floor(usdVolume)
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    }).format(Math.floor(usdVolume));
+  };
+
+  // Function to render percentage change with appropriate styling
+  const renderChange = (change) => {
+    if (!isFinite(change)) {
+      return null;
+    }
+    const changeColor = change >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
+    return (
+      <span className={`inline-block ml-2 px-2 text-sm rounded ${changeColor}`}>
+        {change.toFixed(2)}%
+      </span>
     );
   };
+
+  // Prepare the data for the table rows
+  const tableRows = collectionData.map((trendingCollection) => {
+    const {
+      id,
+      collection,
+      current_trades_count,
+      current_usd_volume,
+      current_volume,
+      previous_trades_count,
+      previous_usd_volume,
+      previous_volume
+    } = trendingCollection;
+
+    // Calculate percentage change
+    const tradesCountChange = computePercentageChange(
+      current_trades_count,
+      previous_trades_count
+    );
+    const usdVolumeChange = computePercentageChange(
+      current_usd_volume,
+      previous_usd_volume
+    );
+    const volumeChange = computePercentageChange(
+      current_volume,
+      previous_volume
+    );
+
+    return {
+      id: id,
+      cover_url: (
+        <img className="w-20 h-20 object-cover" src={collection.cover_url} alt={collection.title} />
+      ),
+      title: collection.title,
+      current_trades_count: (
+        <>
+          {current_trades_count}
+          {renderChange(tradesCountChange)}
+        </>
+      ),
+      current_usd_volume: (
+        <>
+          {formatCurrentUSDVolume(current_usd_volume)}
+          {renderChange(usdVolumeChange)}
+        </>
+      ),
+      current_volume: (
+        <>
+          {formatCurrentVolume(current_volume)}
+          {renderChange(volumeChange)}
+        </>
+      ),
+    };
+  });
 
   // Define the column configuration for the table
   const tableColumns = [
@@ -107,35 +167,11 @@ const TopCollections = () => {
     { key: 'current_volume', header: 'Volume', hideOnMobile: false },
   ];
 
-  // Prepare the data for the table rows
-  const tableRows = data.sui.collections_trending.map((trendingCollection) => {
-    const { id, collection, current_trades_count, current_usd_volume, current_volume } = trendingCollection;
-    return {
-      id: id,
-      cover_url: (
-        <img className="w-20 h-20 object-cover" src={collection.cover_url} alt={collection.title} />
-      ),
-      title: collection.title,
-      current_trades_count: (
-        <>
-          {current_trades_count}
-          {renderChange(current_trades_count, trendingCollection.previous_trades_count)}
-        </>
-      ),
-      current_usd_volume: (
-        <>
-          {formatCurrentUSDVolume(current_usd_volume)}
-          {renderChange(current_usd_volume, trendingCollection.previous_usd_volume)}
-        </>
-      ),
-      current_volume: (
-        <>
-          {formatCurrentVolume(current_volume)}
-          {renderChange(current_volume, trendingCollection.previous_volume)}
-        </>
-      ),
-    };
-  });
+  // Loading state: Display a loading message while data is being fetched
+  if (loading) return <p>Loading...</p>;
+
+  // Error state: Display an error message if there's an error fetching the data
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div>
