@@ -1,11 +1,14 @@
 // src/index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { inject } from '@vercel/analytics';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './apollo';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+inject(); // Add this line to inject Vercel Analytics
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
