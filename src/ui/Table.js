@@ -21,7 +21,9 @@ const Table = ({ data, columns }) => {
                     <th
                       key={column.key}
                       scope="col"
-                      className="relative isolate py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+                      className={`relative isolate py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 ${
+                        column.hideOnMobile ? 'hidden sm:table-cell' : ''
+                      }`}
                     >
                       {column.header}
                       <div className="absolute inset-y-0 right-full -z-10 w-screen border-b border-b-gray-200" />
@@ -36,7 +38,9 @@ const Table = ({ data, columns }) => {
                     {columns.map((column) => (
                       <td
                         key={`${row.id}-${column.key}`}
-                        className="relative py-4 pr-3 text-sm font-medium text-gray-900"
+                        className={`relative py-4 pr-3 text-sm font-medium text-gray-900 ${
+                          column.hideOnMobile ? 'hidden sm:table-cell' : ''
+                        }`}
                       >
                         {row[column.key]}
                         <div className="absolute bottom-0 right-full h-px w-screen bg-gray-100" />

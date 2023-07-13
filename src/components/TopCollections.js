@@ -100,43 +100,42 @@ const TopCollections = () => {
 
   // Define the column configuration for the table
   const tableColumns = [
-    { key: 'cover_url', header: 'Cover' },
-    { key: 'title', header: 'Title' },
-    { key: 'current_trades_count', header: 'Sales' },
-    { key: 'current_usd_volume', header: 'USD Volume' },
-    { key: 'current_volume', header: 'Volume' },
+    { key: 'cover_url', header: 'Cover', hideOnMobile: false },
+    { key: 'title', header: 'Title', hideOnMobile: false },
+    { key: 'current_trades_count', header: 'Sales', hideOnMobile: true },
+    { key: 'current_usd_volume', header: 'USD Volume', hideOnMobile: false },
+    { key: 'current_volume', header: 'Volume', hideOnMobile: false },
   ];
 
   // Prepare the data for the table rows
-  const tableRows = data.sui.collections_trending.map((trendingCollection) => ({
-    id: trendingCollection.id,
-    cover_url: (
-      <img
-        className="w-20 h-20 object-cover"
-        src={trendingCollection.collection.cover_url}
-        alt={trendingCollection.collection.title}
-      />
-    ),
-    title: trendingCollection.collection.title,
-    current_trades_count: (
-      <>
-        {trendingCollection.current_trades_count}
-        {renderChange(trendingCollection.current_trades_count, trendingCollection.previous_trades_count)}
-      </>
-    ),
-    current_usd_volume: (
-      <>
-        {formatCurrentUSDVolume(trendingCollection.current_usd_volume)}
-        {renderChange(trendingCollection.current_usd_volume, trendingCollection.previous_usd_volume)}
-      </>
-    ),
-    current_volume: (
-      <>
-        {formatCurrentVolume(trendingCollection.current_volume)}
-        {renderChange(trendingCollection.current_volume, trendingCollection.previous_volume)}
-      </>
-    ),
-  }));
+  const tableRows = data.sui.collections_trending.map((trendingCollection) => {
+    const { id, collection, current_trades_count, current_usd_volume, current_volume } = trendingCollection;
+    return {
+      id: id,
+      cover_url: (
+        <img className="w-20 h-20 object-cover" src={collection.cover_url} alt={collection.title} />
+      ),
+      title: collection.title,
+      current_trades_count: (
+        <>
+          {current_trades_count}
+          {renderChange(current_trades_count, trendingCollection.previous_trades_count)}
+        </>
+      ),
+      current_usd_volume: (
+        <>
+          {formatCurrentUSDVolume(current_usd_volume)}
+          {renderChange(current_usd_volume, trendingCollection.previous_usd_volume)}
+        </>
+      ),
+      current_volume: (
+        <>
+          {formatCurrentVolume(current_volume)}
+          {renderChange(current_volume, trendingCollection.previous_volume)}
+        </>
+      ),
+    };
+  });
 
   return (
     <div>
