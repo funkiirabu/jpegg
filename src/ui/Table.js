@@ -4,14 +4,6 @@ const Table = ({ data, columns }) => {
   return (
     <div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:items-center">
-          <div className="sm:flex-auto">
-            <h1 className="text-base font-semibold leading-6 text-gray-900">Trending Collections</h1>
-            <p className="mt-2 text-sm text-gray-700">
-              A list of trending collections including their cover, title, sales, USD volume, and Sui volume.
-            </p>
-          </div>
-        </div>
         <div className="mt-8 flow-root overflow-hidden">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <table className="w-full text-left">
