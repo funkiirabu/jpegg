@@ -81,11 +81,11 @@ const TopCollections = () => {
   // Function to format the current_volume property
   const formatCurrentVolume = (volume) => {
     if (volume >= 1000000000) {
-      return `${(volume / 1000000000).toFixed(2)}B`;
+      return `${(volume / 1000000000).toFixed(2)}`;
     } else if (volume >= 1000000) {
-      return `${(volume / 1000000).toFixed(2)}M`;
+      return `${(volume / 1000000).toFixed(2)}`;
     } else if (volume >= 1000) {
-      return `${(volume / 1000).toFixed(2)}K`;
+      return `${(volume / 1000).toFixed(2)}`;
     } else {
       return volume.toFixed(0);
     }
@@ -103,8 +103,8 @@ const TopCollections = () => {
     { key: 'cover_url', header: 'Cover' },
     { key: 'title', header: 'Title' },
     { key: 'current_trades_count', header: 'Sales' },
-    { key: 'current_usd_volume', header: '24h USD Volume' },
-    { key: 'current_volume', header: '24h Sui Volume' },
+    { key: 'current_usd_volume', header: 'USD Volume' },
+    { key: 'current_volume', header: 'Volume' },
   ];
 
   // Prepare the data for the table rows
