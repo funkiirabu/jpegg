@@ -71,10 +71,6 @@ const TopCollections = () => {
 
   // Function to format the current_volume property
   const formatCurrentVolume = (volume) => {
-    if (typeof volume !== 'number' || isNaN(volume)) {
-      return ''; // Return an empty string or any other default value
-    }
-    
     if (volume >= 1000000000) {
       return `${(volume / 1000000000).toFixed(2)}`;
     } else if (volume >= 1000000) {
@@ -95,6 +91,25 @@ const TopCollections = () => {
     }).format(Math.floor(usdVolume));
   };
 
+  // Function to render percentage change with appropriate styling
+  const renderChange = (change, columnKey) => {
+    if (columnKey === 'floor') {
+      return null; // Skip rendering change for the floor column
+    }
+
+    if (!isFinite(change)) {
+      return null;
+    }
+
+    const changeColor = change >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
+    return (
+      <span className={`inline-block ml-2 px-2 text-sm rounded ${changeColor}`}>
+        {change.toFixed(2)}%
+      </span>
+    );
+  };
+
+
   // Function to format the floor property
   const formatFloor = (floor) => {
     if (typeof floor !== 'number' || isNaN(floor)) {
@@ -112,19 +127,6 @@ const TopCollections = () => {
     }
   };
 
-  // Function to render percentage change with appropriate styling
-  const renderChange = (change) => {
-    if (!isFinite(change) || isNaN(change)) {
-      return null;
-    }
-    const changeColor = change >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
-    return (
-      <span className={`inline-block ml-2 px-2 text-sm rounded ${changeColor}`}>
-        {change.toFixed(2)}%
-      </span>
-    );
-  };
-
   // Prepare the data for the table rows
   const tableRows = collectionData.map((trendingCollection) => {
     const {
@@ -132,8 +134,10 @@ const TopCollections = () => {
       collection,
       current_trades_count,
       current_usd_volume,
+      current_volume,
       previous_trades_count,
-      previous_usd_volume
+      previous_usd_volume,
+      previous_volume
     } = trendingCollection;
 
     // Calculate percentage change
@@ -146,12 +150,12 @@ const TopCollections = () => {
       previous_usd_volume
     );
     const volumeChange = computePercentageChange(
-      collection.volume,
-      trendingCollection.previous_volume // Use the correct previous value for volume
+      current_volume,
+      previous_volume
     );
     const floorChange = computePercentageChange(
       collection.floor,
-      trendingCollection.previous_volume // Use the correct previous value for floor
+      previous_volume
     );
 
     return {
@@ -163,26 +167,26 @@ const TopCollections = () => {
       floor: (
         <>
           {formatFloor(collection.floor)}
-          {renderChange(floorChange)}
+          {renderChange(floorChange, 'floor')}
         </>
       ),
       verified: collection.verified ? 'Yes' : 'No',
       current_trades_count: (
         <>
           {current_trades_count}
-          {renderChange(tradesCountChange)}
+          {renderChange(tradesCountChange, 'current_trades_count')}
         </>
       ),
       current_usd_volume: (
         <>
           {formatCurrentUSDVolume(current_usd_volume)}
-          {renderChange(usdVolumeChange)}
+          {renderChange(usdVolumeChange, 'current_usd_volume')}
         </>
       ),
       current_volume: (
         <>
-          {formatCurrentVolume(collection.volume)}
-          {renderChange(volumeChange)}
+          {formatCurrentVolume(current_volume)}
+          {renderChange(volumeChange, 'current_volume')}
         </>
       ),
     };
@@ -193,7 +197,6 @@ const TopCollections = () => {
     { key: 'cover_url', header: 'Cover', hideOnMobile: false },
     { key: 'title', header: 'Title', hideOnMobile: false },
     { key: 'floor', header: 'Floor', hideOnMobile: false },
-    { key: 'verified', header: 'Verified', hideOnMobile: false },
     { key: 'current_trades_count', header: 'Sales', hideOnMobile: false },
     { key: 'current_usd_volume', header: 'USD Volume', hideOnMobile: false },
     { key: 'current_volume', header: 'Volume', hideOnMobile: false },
