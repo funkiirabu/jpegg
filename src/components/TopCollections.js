@@ -85,7 +85,6 @@ const TopCollections = () => {
       return volume.toFixed(0);
     }
   };
-  
 
   // Function to format the current_usd_volume property in USD currency format
   const formatCurrentUSDVolume = (usdVolume) => {
@@ -96,9 +95,26 @@ const TopCollections = () => {
     }).format(Math.floor(usdVolume));
   };
 
+  // Function to format the floor property
+  const formatFloor = (floor) => {
+    if (typeof floor !== 'number' || isNaN(floor)) {
+      return ''; // Return an empty string or any other default value
+    }
+
+    if (floor >= 1000000000) {
+      return `${(floor / 1000000000).toFixed(2)}`;
+    } else if (floor >= 1000000) {
+      return `${(floor / 1000000).toFixed(2)}`;
+    } else if (floor >= 1000) {
+      return `${(floor / 1000).toFixed(2)}`;
+    } else {
+      return floor.toFixed(0);
+    }
+  };
+
   // Function to render percentage change with appropriate styling
   const renderChange = (change) => {
-    if (!isFinite(change)) {
+    if (!isFinite(change) || isNaN(change)) {
       return null;
     }
     const changeColor = change >= 0 ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
@@ -116,10 +132,8 @@ const TopCollections = () => {
       collection,
       current_trades_count,
       current_usd_volume,
-      current_volume,
       previous_trades_count,
-      previous_usd_volume,
-      previous_volume
+      previous_usd_volume
     } = trendingCollection;
 
     // Calculate percentage change
@@ -132,8 +146,12 @@ const TopCollections = () => {
       previous_usd_volume
     );
     const volumeChange = computePercentageChange(
-      current_volume,
-      previous_volume
+      collection.volume,
+      trendingCollection.previous_volume // Use the correct previous value for volume
+    );
+    const floorChange = computePercentageChange(
+      collection.floor,
+      trendingCollection.previous_volume // Use the correct previous value for floor
     );
 
     return {
@@ -142,6 +160,13 @@ const TopCollections = () => {
         <img className="w-20 h-20 object-cover" src={collection.cover_url} alt={collection.title} />
       ),
       title: collection.title,
+      floor: (
+        <>
+          {formatFloor(collection.floor)}
+          {renderChange(floorChange)}
+        </>
+      ),
+      verified: collection.verified ? 'Yes' : 'No',
       current_trades_count: (
         <>
           {current_trades_count}
@@ -156,7 +181,7 @@ const TopCollections = () => {
       ),
       current_volume: (
         <>
-          {formatCurrentVolume(current_volume)}
+          {formatCurrentVolume(collection.volume)}
           {renderChange(volumeChange)}
         </>
       ),
@@ -167,7 +192,9 @@ const TopCollections = () => {
   const tableColumns = [
     { key: 'cover_url', header: 'Cover', hideOnMobile: false },
     { key: 'title', header: 'Title', hideOnMobile: false },
-    { key: 'current_trades_count', header: 'Sales', hideOnMobile: true },
+    { key: 'floor', header: 'Floor', hideOnMobile: false },
+    { key: 'verified', header: 'Verified', hideOnMobile: false },
+    { key: 'current_trades_count', header: 'Sales', hideOnMobile: false },
     { key: 'current_usd_volume', header: 'USD Volume', hideOnMobile: false },
     { key: 'current_volume', header: 'Volume', hideOnMobile: false },
   ];
