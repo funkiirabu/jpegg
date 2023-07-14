@@ -71,6 +71,10 @@ const TopCollections = () => {
 
   // Function to format the current_volume property
   const formatCurrentVolume = (volume) => {
+    if (typeof volume !== 'number' || isNaN(volume)) {
+      return ''; // Return an empty string or any other default value
+    }
+    
     if (volume >= 1000000000) {
       return `${(volume / 1000000000).toFixed(2)}`;
     } else if (volume >= 1000000) {
@@ -81,6 +85,7 @@ const TopCollections = () => {
       return volume.toFixed(0);
     }
   };
+  
 
   // Function to format the current_usd_volume property in USD currency format
   const formatCurrentUSDVolume = (usdVolume) => {
