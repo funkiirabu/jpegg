@@ -197,7 +197,7 @@ const TopCollections = () => {
     { key: 'cover_url', header: 'Cover', hideOnMobile: false },
     { key: 'title', header: 'Title', hideOnMobile: false },
     { key: 'floor', header: 'Floor', hideOnMobile: false },
-    { key: 'current_trades_count', header: 'Sales', hideOnMobile: false },
+    { key: 'current_trades_count', header: 'Sales', hideOnMobile: true },
     { key: 'current_usd_volume', header: 'USD Volume', hideOnMobile: false },
     { key: 'current_volume', header: 'Volume', hideOnMobile: false },
   ];
