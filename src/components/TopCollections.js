@@ -70,15 +70,21 @@ const TopCollections = () => {
   const computePercentageChange = (current, previous) => ((current - previous) / previous) * 100;
 
   // Function to format the current_volume property
-  const formatCurrentVolume = (volume) => {
+  const formatCurrentVolume = (volume, previousVolume) => {
+    if (typeof volume !== 'number' || isNaN(volume)) {
+      return ''; // Return an empty string or any other default value
+    }
+
+    const change = computePercentageChange(volume, previousVolume);
+
     if (volume >= 1000000000) {
-      return `${(volume / 1000000000).toFixed(2)}`;
+      return `${(volume / 1000000000).toFixed(2)}${change.toFixed(2)}%`;
     } else if (volume >= 1000000) {
-      return `${(volume / 1000000).toFixed(2)}`;
+      return `${(volume / 1000000).toFixed(2)}${change.toFixed(2)}%`;
     } else if (volume >= 1000) {
-      return `${(volume / 1000).toFixed(2)}`;
+      return `${(volume / 1000).toFixed(2)}${change.toFixed(2)}%`;
     } else {
-      return volume.toFixed(0);
+      return `${volume.toFixed(0)}${change.toFixed(2)}%`;
     }
   };
 
@@ -108,7 +114,6 @@ const TopCollections = () => {
       </span>
     );
   };
-
 
   // Function to format the floor property
   const formatFloor = (floor) => {
@@ -185,7 +190,7 @@ const TopCollections = () => {
       ),
       current_volume: (
         <>
-          {formatCurrentVolume(current_volume)}
+          {formatCurrentVolume(current_volume, previous_volume)}
           {renderChange(volumeChange, 'current_volume')}
         </>
       ),
@@ -195,7 +200,7 @@ const TopCollections = () => {
   // Define the column configuration for the table
   const tableColumns = [
     { key: 'cover_url', header: 'Cover', hideOnMobile: false },
-    { key: 'title', header: 'Title', hideOnMobile: false },
+    { key: 'title', header: 'Title', hideOnMobile: false, responsiveWidth: '20%' },
     { key: 'floor', header: 'Floor', hideOnMobile: false },
     { key: 'current_trades_count', header: 'Sales', hideOnMobile: true },
     { key: 'current_usd_volume', header: 'USD Volume', hideOnMobile: true },
